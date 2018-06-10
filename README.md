@@ -1,6 +1,6 @@
 # php:// Mock Library
 
-[![Travis CI](https://secure.travis-ci.org/syberisle/mock-php-stream.png)](https://travis-ci.org/syberisle/mock-php-stream) [![Code Climate](https://codeclimate.com/github/syberisle/mock-php-stream/badges/gpa.svg)](https://codeclimate.com/github/syberisle/mock-php-stream)
+[![Travis CI](https://secure.travis-ci.org/SyberIsle/mock-php-stream.png)](https://travis-ci.org/SyberIsle/mock-php-stream) [![Code Climate](https://codeclimate.com/github/SyberIsle/mock-php-stream/badges/gpa.svg)](https://codeclimate.com/github/SyberIsle/mock-php-stream)
 
 This library is intended to be used to mock the `php://` stream wrapper.
 
