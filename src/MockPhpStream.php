@@ -99,7 +99,9 @@ class MockPhpStream
 	public function stream_close()
 	{
 		if (!empty($this->content)) {
-			self::$data[$this->path] = $this->content;
+			if (isset(self::$data)) {
+				self::$data[$this->path] = $this->content;
+			}
 		}
 	}
 
