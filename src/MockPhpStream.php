@@ -105,8 +105,27 @@ class MockPhpStream
 		}
 	}
 
-	public function stream_seek($offset, $whence = SEEK_SET)
-	{
-	}
+    /**
+     * stream_seek method mock implementation
+     * just returns seek success response - that's enough for basic tests
+     * stream position pointer moving is not implemented
+     * @param $offset
+     * @param int $whence
+     * @return bool
+     */
+    public function stream_seek($offset, $whence = SEEK_SET)
+    {
+        return true;
+    }
+
+    /**
+     * stream_tell method mock implementation
+     * requred for testing code that uses fseek() on mocked stream
+     * @return int
+     */
+    public function stream_tell()
+    {
+        return $this->index;
+    }
 
 }
