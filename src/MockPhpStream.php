@@ -100,7 +100,9 @@ class MockPhpStream
 	{
 		if (!empty($this->content)) {
 			if (isset(self::$data)) {
-				self::$data[$this->path] = $this->content;
+				if ($this->path !== 'php://temp') {
+					self::$data[$this->path] = $this->content;
+				}
 			}
 		}
 	}
