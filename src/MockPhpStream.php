@@ -7,27 +7,38 @@
  */
 class MockPhpStream
 {
-	private static $data = array();
+	/**
+	 * The current context, or null. Required to be public so that PHP can populate it.
+	 *
+	 * @see {https://www.php.net/manual/en/class.streamwrapper.php}
+	 * @var resource
+	 */
+	public $context;
+
+	/**
+	 * @var array<string, string> data for the given stream
+	 */
+	private static array $data = array();
 
 	/**
 	 * @var string the current file path
 	 */
-	private $path;
+	private string $path;
 
 	/**
 	 * @var string the file content
 	 */
-	private $content = '';
+	private string $content = '';
 
 	/**
 	 * @var int The current position in the content
 	 */
-	private $index = 0;
+	private int $index = 0;
 
 	/**
 	 * @var int The length of the content
 	 */
-	private $length = 0;
+	private int $length = 0;
 
 	/**
 	 * Registers this class as the 'php' stream wrapper
@@ -48,14 +59,14 @@ class MockPhpStream
 
 	// Stream functions
 
-	public function stream_stat()
+	public function stream_stat(): array|false
 	{
 		return array();
 	}
 
-	public function stream_open($path, $mode, $options, &$opened_path)
+	public function stream_open(string $path, string $mode, int $options, ?string &$opened_path): bool
 	{
-		if (strpos($mode, 'w') !== false) {
+		if (str_contains($mode, 'w')) {
 			unset(self::$data[$path]);
 		}
 
@@ -70,7 +81,7 @@ class MockPhpStream
 		return true;
 	}
 
-	public function stream_write($data)
+	public function stream_write(string $data): int
 	{
 		$this->content .= $data;
 		$this->length  += strlen($data);
@@ -78,12 +89,12 @@ class MockPhpStream
 		return strlen($data);
 	}
 
-	public function stream_eof()
+	public function stream_eof(): bool
 	{
 		return $this->index >= $this->length;
 	}
 
-	public function stream_read($count)
+	public function stream_read(int $count): string|false
 	{
 		if (empty($this->content)) {
 			return '';
@@ -96,38 +107,32 @@ class MockPhpStream
 		return $data;
 	}
 
-	public function stream_close()
+	public function stream_close(): void
 	{
-		if (!empty($this->content)) {
-			if (isset(self::$data)) {
-				if ($this->path !== 'php://temp') {
-					self::$data[$this->path] = $this->content;
-				}
-			}
+		if (str_starts_with($this->path, "php://temp") || $this->path === "php://memory") {
+			return;
+		}
+
+		if (!empty($this->content) && isset(self::$data)) {
+			self::$data[$this->path] = $this->content;
 		}
 	}
 
-    /**
-     * stream_seek method mock implementation
-     * just returns seek success response - that's enough for basic tests
-     * stream position pointer moving is not implemented
-     * @param $offset
-     * @param int $whence
-     * @return bool
-     */
-    public function stream_seek($offset, $whence = SEEK_SET)
-    {
-        return true;
-    }
+	/**
+	 * just returns seek success response - that's enough for basic tests
+	 *
+	 * NOTE: stream position pointer moving is not implemented
+	 */
+	public function stream_seek(int $offset, int $whence = SEEK_SET): bool
+	{
+		return true;
+	}
 
-    /**
-     * stream_tell method mock implementation
-     * requred for testing code that uses fseek() on mocked stream
-     * @return int
-     */
-    public function stream_tell()
-    {
-        return $this->index;
-    }
-
+	/**
+	 * requred for testing code that uses fseek() on mocked stream
+	 */
+	public function stream_tell(): int
+	{
+		return $this->index;
+	}
 }

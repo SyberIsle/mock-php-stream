@@ -4,8 +4,12 @@
 
 This library is intended to be used to mock the `php://` stream wrapper.
 
-It's highly recommended that you register/unregister this ONLY when you need it in a test. Otherwise it could interfere
+It's highly recommended that you register/unregister this ONLY when you need it in a test. Otherwise, it could interfere
 with other built-in php streams during the course of it being registered.
+
+**NOTE** Since version 2.0 the `php://temp[/maxmemory:NN]` and `php://memory` paths will behave as PHP does. The content
+written to them will not be available after the `stream_close` call. This means that `file_put_contents` and  
+`file_get_contents` cannot be used to read and write these two paths.
 
 ## Installation
 
@@ -13,8 +17,7 @@ with other built-in php streams during the course of it being registered.
 
 ## Usage
 
-Using this to test a Slim 3 app's ability to do direct file uploads, where the body IS the content, is
-now easier. 
+Using this to test a Slim 3 app's ability to do direct file uploads, where the body IS the content, is now easier. 
 
 ```php
 MockPhpStream::register();

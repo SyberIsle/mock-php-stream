@@ -3,12 +3,12 @@
 class MockPhpStreamTest
 	extends \PHPUnit\Framework\TestCase
 {
-	public function setUp()
+	public function setUp(): void
 	{
 		stream_wrapper_register('mps', MockPhpStream::class);
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
 		stream_wrapper_unregister('mps');
 	}
@@ -51,5 +51,32 @@ class MockPhpStreamTest
 
 		// because the built-in is read-only, we'd get an error/warning from PHP itself hences the suppression
 		self::assertFalse(@file_put_contents("php://input", 'bird'));
+	}
+
+	/**
+	 * php://temp is basically a new file evey time it's called
+	 */
+	public function testPhpTempIsNotPersistent()
+	{
+		MockPhpStream::register();
+
+		self::assertEquals(5, file_put_contents("php://temp", 'kakaw'));
+		self::assertEmpty(file_get_contents("php://temp"));
+
+		// include the maxmemory option as well
+		self::assertEquals(5, file_put_contents('php://temp/maxmemory:4', 'kakaw'));
+		self::assertEmpty(file_get_contents('php://temp/maxmemory:4'));
+
+		MockPhpStream::restore();
+	}
+
+	public function testPhpMemoryIsNotPersistent()
+	{
+		MockPhpStream::register();
+
+		self::assertEquals(5, file_put_contents("php://memory", 'kakaw'));
+		self::assertEmpty(file_get_contents("php://memory"));
+
+		MockPhpStream::restore();
 	}
 }
